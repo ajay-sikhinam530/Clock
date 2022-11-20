@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+
+        body, .wrapper,.content{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        body{
+            min-height: 100vh;
+            background: aqua;
+        }
+        .wrapper{
+            width: 600px;
+            background: #ffff;
+            border-radius: 10px;
+            flex-direction: column;
+            padding: 30px 30px 30px;
+        }
+
+        .wrapper .stamp{
+            padding: 5px;
+            margin: 10px 0px;
+        }
+        .wrapper h2{
+            font-size: 38px;
+            font-weight: 500px;
+            margin: 30px 0;
+        }
+        .wrapper .content{
+            width: 100%;
+            justify-content: space-between;
+            background: none;
+        }
+        .content .column{
+            border-radius: 15px;
+            border: 3px solid #999;
+            width:calc(100%/4);
+            margin: 0 5px;
+            padding: 5px;
+        }
+        .column select{
+            outline: none;
+            border: none;
+            height: 40px;
+            width: 100%;
+            font-size: 19px;
+        }
+        .wrapper button{
+            width: 100%;
+            outline: none;
+            border: none;
+            cursor: pointer;
+            color: #ffff;
+            margin-top: 20px;
+            font-size: 20px;
+            padding: 17px 0;
+            border-radius: 5px;
+            background: #4a98f7;
+        }
+        .alarms{
+            width: 100%;
+            margin: 20px 20px;
+            padding: 10px 0;
+            background: #BABCBE8d;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+        .alarms h4{
+            text-align: center;
+            font-size: 25px;
+        }
+
+        .alarms .alarm-item{
+            display: flex;
+            margin: 7px 15px;
+            padding: 0 10px;
+            height: 30px;
+            background: white;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .alarm-item .remove-alarm{
+            width: 25%;
+            background: #C8592A;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+            padding: 0px 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .alarm-item .snooze-alarm{
+            width: 25%;
+            background: #F1C247;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+            padding: 0px 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+    </style>
+    <title>Alarm Clock</title>
+</head>
+<body>
+    <div class="wrapper">
+        <h1 class="stamp"> Clock </h1>
+        <h2>12:35:36 AM</h2>
+        <div class="alarms">
+            <h4>Alarm list</h4>
+        </div>
+        <div class="content">
+            <div class="column">
+                <select >
+                    <option value="Hour"selected hidden>Hour</option>
+                </select>
+            </div>
+            <div class="column">
+                <select >
+                    <option value="Minute" selected hidden>Minute</option>
+                </select>
+            </div>
+            <div class="column">
+                <select >
+                    <option value="AMPM" selected hidden>AM/PM</option>
+                </select>
+            </div>
+            <div class="column">
+                <select >
+                    <option value="Day" selected hidden>Day</option>
+                    <option value="sunday">sunday</option>
+                    <option value="monday">monday</option>
+                    <option value="tuesday">tuesday</option>
+                    <option value="wednesday">wednesday</option>
+                    <option value="thursday">thursday</option>
+                    <option value="friday">friday</option>
+                    <option value="saturday">saturday</option>
+
+                </select>
+            </div>
+        </div>
+        <button>Set Alarm</button>
+    </div>
+
+
+    <script>
+        const currentTime = document.querySelector("h2"),
+        alarmMenu = document.querySelector(".alarms"),
+        selectMenu = document.querySelectorAll("select");
+        const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+        var alarmTimes = [];
+
+
+        for(let i = 12; i>0; i--){
+            i = i<10? "0"+i : i;
+            let option = `<option value="${i}">${i}</option>`;
+            selectMenu[0].firstElementChild.insertAdjacentHTML("afterend",option)
+        }
+        for(let i = 59; i>0; i--){
+            i = i<10? "0"+i : i;
+            let option = `<option value="${i}">${i}</option>`;
+            selectMenu[1].firstElementChild.insertAdjacentHTML("afterend",option)
+        }
+        for(let i = 2; i>0; i--){
+            let ampm = i==1?"AM":"PM";
+            let option = `<option value="${ampm}">${ampm}</option>`;
+            selectMenu[2].firstElementChild.insertAdjacentHTML("afterend",option)
+        }
+
+        setInterval(() => {
+            let date = new Date(),
+            h = date.getHours(),
+            m = date.getMinutes(),
+            s = date.getSeconds(),
+            d = date.getDay();
+            d = days[d];
+            ampm = "AM";
+            if(h>=12){
+                h = h-12;
+                ampm = "PM"
+            }
+            h = h==0? h=12 : h;
+            h = h<10?"0"+h:h;
+            m = m<10?"0"+m:m;
+            s = s<10?"0"+s:s;
+            currentTime.innerHTML = h+":"+m+":"+s+""+ampm+" "+d;
+            alarmTimes.forEach(time => {
+                if(time==`${h}:${m}:${ampm} ${d}`){
+                    removeAlarm(time);
+                    alert("alarm ringing ....")
+                }
+            });
+        }, 1000);
+
+        function setAlarm(){
+            let time = `${selectMenu[0].value}:${selectMenu[1].value}:${selectMenu[2].value} ${selectMenu[3].value}`;
+            if(time.includes("Hour")||time.includes("Minute")||time.includes("AM/PM")){
+                return alert("Set proper alarm");
+            }
+            let currTime = currentTime.innerText
+            console.log(currTime);
+            addAlarm(time);
+        }
+
+
+        function addAlarm(time){
+            alarmTimes.push(time);
+            console.log("alarm set for ",time);
+            console.log("alarms-list ->",alarmTimes);
+            let alarmItem = document.createElement("div");
+            alarmItem.classList.add("alarm-item");
+            alarmItem.id = time;
+            alarmItem.innerHTML=`<span>${time}</span>
+            <div class="snooze-alarm" id="snooze-alarm${time}">Snooze-<span>3</span></div>
+            <div class="remove-alarm" id= "remove-alarm${time}">Remove</div>`;
+            alarmMenu.appendChild(alarmItem);
+            let removeid = "remove-alarm"+time;
+            document.getElementById(removeid).addEventListener("click",function(){
+                removeAlarm(time);
+            })
+            let snoozeid = "snooze-alarm"+time;
+            document.getElementById(snoozeid).addEventListener("click",function(){
+                snoozeAlarm(time);
+            })
+        }
+
+        function removeAlarm(time){
+            let index = alarmTimes.indexOf(time);
+            alarmTimes.splice(index,1);
+            console.log("alarm-removed ",time);
+            console.log("alarm-times ->",alarmTimes);
+            document.getElementById(time).remove();
+        }
+
+        function snoozeAlarm(time){
+            h = time[0]+time[1];
+            m = time[3]+time[4];
+            ampm = time[6]+time[7];
+            d = time.substr(9,time.length-9);
+            nm = parseInt(m)+5;
+            if(nm>59){
+                nh = parseInt(h)+1
+                nm = nm%59;
+                if(nh==12 && ampm=="AM"){
+                    nampm = "PM";
+                    nd = d;
+                }
+                else if(nh==12 && ampm=="PM"){
+                    nampm = "AM";
+                    nd = days[(days.indexOf(d)+1)==7?0:(days.indexOf(d)+1)];
+                }
+                else{
+                    nampm = ampm;
+                    nd = d;
+                }
+            }
+            else{
+                nh = h,nampm=ampm,nd=d;
+            }
+            nh = nh==13? nh=1 : nh;
+            nm = nm<10? "0"+nm :nm ;
+            newTime = nh+":"+nm+":"+nampm+" "+nd;
+            console.log("snoozed - ",time);
+            let alarm = document.getElementById("snooze-alarm"+time);
+            console.log(alarm);
+            let snoozes = parseInt(alarm.firstElementChild.innerText);
+            if(snoozes>1){
+
+                console.log("new-date-> "+newTime);
+                removeAlarm(time);
+                addAlarm(newTime);
+                newAlarm = document.getElementById("snooze-alarm"+newTime)
+                newAlarm.firstElementChild.innerText = snoozes-1;
+            }
+            else{
+                removeAlarm(time);
+            }
+        }
+
+        document.querySelector("button").addEventListener("click",setAlarm);
+    </script>
+</body>
+</html>
